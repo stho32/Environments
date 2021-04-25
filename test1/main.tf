@@ -1,4 +1,6 @@
 variable "vultr_access_key" { sensitive = true }
+variable "ssh_key" { sensitive = true }
+variable "private_key_file" { sensitive = true }
 
 terraform {
   required_providers {
@@ -24,11 +26,26 @@ resource "vultr_instance" "testmachine" {
     tag = ""
     hostname = "tm001"
     activation_email = false
+    ssh_key_ids = [ var.ssh_key ]
+
+    provisioner "local-exec" {
+      command = "echo \"SERVER-IP ${self.main_ip}\""
+    }
 
     provisioner "remote-exec" {
       inline = [
         "apt-get install -y nodejs"
       ]
+
+      connection {
+        type     = "ssh"
+        host     = self.main_ip
+        user     = "root"
+        password = self.default_password
+        timeout  = "2m"  
+        #private_key = var.private_key_file
+        #agent = true    
+      }
     }
 }
 /*
