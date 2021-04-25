@@ -1,4 +1,4 @@
-variable "vultr_access_key" {
+variable "vultr_access_key" { sensitive = true }
 
 terraform {
   required_providers {
